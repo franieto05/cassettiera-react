@@ -1,0 +1,73 @@
+.contenitore-principale {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  font-family: system-ui, sans-serif;
+}
+
+.cassettiera {
+  width: 300px;
+  background-color: #5c3a21;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cassetto {
+  height: 80px;
+  background-color: #8b5a2b;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+  user-select: none;
+}
+
+.maniglia {
+  width: 60px;
+  height: 12px;
+  background-color: #d4af37;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  transition: opacity 0.2s;
+}
+
+.contenuto {
+  position: absolute;
+  color: white;
+  font-weight: bold;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.cassetto.aperto {
+  transform: translateY(15px) scale(1.05);
+  background-color: #3e2716;
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.cassetto.aperto .maniglia {
+  opacity: 0;
+}
+
+.cassetto.aperto .contenuto {
+  opacity: 1;
+}
+
+.messaggio {
+  margin-top: 25px;
+  font-size: 1.1rem;
+  color: #333;
+}

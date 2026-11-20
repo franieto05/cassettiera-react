@@ -1,0 +1,176 @@
+/* ---------- CASSETTIERA ----------
+   Ogni cassetto è un pannello basso. Aprendolo, il fronte scorre verso il basso
+   e scopre il vano che stava dietro, con l'animazione dentro. */
+
+.md-column,
+.md-grid {
+  --md-front-h: 64px;  /* altezza del fronte (cassetto chiuso) */
+  --md-open-h: 270px;  /* altezza totale del cassetto aperto (fronte + vano) */
+  width: min(200px, 80vw);
+  margin: 24px auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-radius: 8px;
+  background: linear-gradient(#5a3a26, #3a2316);
+  box-shadow: 0 10px 26px #000a, inset 0 0 0 3px #2b1a10;
+}
+
+/* Spazio occupato dal cassetto: cresce quando si apre */
+.monster-drawer {
+  position: relative;
+  width: 100%;
+  height: var(--md-front-h);
+  overflow: hidden;
+  border-radius: 4px;
+  transition: height 0.9s cubic-bezier(0.6, 0.05, 0.25, 1);
+}
+
+.monster-drawer.is-open {
+  height: var(--md-open-h);
+}
+
+/* Vano: sta dietro il fronte, in alto */
+.monster-drawer .md-interior {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--md-open-h) - var(--md-front-h));
+  border-radius: 4px;
+  background: radial-gradient(ellipse at 50% 85%, #2a1b20 0%, #0b0709 75%);
+  box-shadow: inset 0 0 30px #000, inset 0 0 0 3px #3b2418;
+}
+
+.monster-drawer .md-interior svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Immagine dentro il vano.
+   .md-imgbox è mosso dall'animazione in JS (emersione); .md-img ha un lento zoom continuo */
+.monster-drawer .md-imgbox {
+  position: absolute;
+  inset: 3px;               /* lascia visibile la cornice del vano */
+  border-radius: 2px;
+  overflow: hidden;
+  opacity: 0;               /* l'animazione la fa comparire */
+  will-change: filter, transform, opacity;
+}
+
+.monster-drawer .md-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;        /* usa "contain" per vedere l'immagine intera */
+  object-position: center;
+  animation: md-kb 12s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+
+.monster-drawer.is-open .md-img { animation-play-state: running; }
+
+/* bordi scuri, come una vecchia pellicola */
+.monster-drawer .md-imgbox::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 28px 6px #000c;
+  pointer-events: none;
+}
+
+/* riflesso di luce che attraversa l'immagine quando è nitida */
+.monster-drawer .md-imgbox::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(100deg, transparent 35%, #fff8 50%, transparent 65%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+
+.monster-drawer .md-imgbox.alive::before { animation: md-sweep 1.4s ease-out 1 both; }
+
+@keyframes md-kb {
+  from { transform: scale(1) translate(0, 0); }
+  to   { transform: scale(1.12) translate(-2%, -2%); }
+}
+
+@keyframes md-sweep {
+  from { transform: translateX(-120%); opacity: 0; }
+  30%  { opacity: 0.8; }
+  to   { transform: translateX(120%); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .monster-drawer .md-img { animation: none; }
+  .monster-drawer .md-imgbox::before { display: none; }
+}
+
+/* Fronte: copre il vano da chiuso, scende in basso da aperto */
+.monster-drawer .md-front {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--md-front-h);
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 2;
+  background: linear-gradient(#7a5037, #54341f);
+  box-shadow: inset 0 0 0 3px #3b2418;
+  transition: transform 0.9s cubic-bezier(0.6, 0.05, 0.25, 1), filter 0.2s;
+}
+
+.monster-drawer .md-front.open {
+  transform: translateY(calc(var(--md-open-h) - var(--md-front-h)));
+}
+
+.monster-drawer .md-front:hover { filter: brightness(1.12); }
+
+.monster-drawer .md-front:focus-visible {
+  outline: 3px solid #d9b46a;
+  outline-offset: -3px;
+}
+
+.monster-drawer .md-handle {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  width: 36%;
+  height: 8px;
+  transform: translateX(-50%);
+  border-radius: 4px;
+  background: linear-gradient(#d9b46a, #8a6a2a);
+  box-shadow: 0 2px 3px #0008;
+}
+
+.monster-drawer .md-label {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 8px;
+  border-radius: 2px;
+  background: #d9b46a;
+  color: #2a1a0c;
+  font: 600 0.58rem/1 Georgia, serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: inset 0 0 0 1px #8a6a2a;
+}
+
+/* occhi che pulsano a trasformazione completata (se il disegno usa .dd-eyes) */
+.monster-drawer svg.alive .dd-eyes {
+  animation: md-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes md-pulse {
+  50% { opacity: 0.65; }
+}
